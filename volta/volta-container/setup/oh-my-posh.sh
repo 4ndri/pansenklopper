@@ -1,6 +1,6 @@
 #!/bin/sh
 
-ohmyposhEval = 'eval "$(oh-my-posh init bash)"'
+ohmyposhEval='eval "$(oh-my-posh init bash --config ~/.poshthemes/jandedobbeleer.omp.json)"'
 SetPrompt(){
   FILE=$1
   if test -f "$FILE"; then

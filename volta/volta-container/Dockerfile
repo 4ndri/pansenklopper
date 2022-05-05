@@ -6,7 +6,6 @@ ARG VARIANT="bullseye"
 ARG PWSH=""
 ARG OHMYPOSH=""
 
-ARG USERNAME=vscode
 FROM mcr.microsoft.com/vscode/devcontainers/base:0-${VARIANT} as base
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends curl ca-certificates gnupg apt-transport-https
@@ -14,14 +13,14 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 # volta
 FROM base AS voltabase
 
-USER $USERNAME
+USER vscode
 # volta.sh node shim
 RUN curl https://get.volta.sh | bash
 
 # powershell
 FROM voltabase as voltabasepwsh
 
-USER $USERNAME
+USER vscode
 # install powershell
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add - \
     && sudo sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/microsoft-debian-bullseye-prod bullseye main" > /etc/apt/sources.list.d/microsoft.list' \
@@ -30,7 +29,7 @@ RUN curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add - 
 
 # oh-my-posh
 FROM voltabase${PWSH} as voltabaseohmyposh
-USER $USERNAME
+USER vscode
 
 RUN sudo wget https://github.com/JanDeDobbeleer/oh-my-posh/releases/latest/download/posh-linux-amd64 -O /usr/local/bin/oh-my-posh \
     && sudo chmod +x /usr/local/bin/oh-my-posh
@@ -45,11 +44,12 @@ RUN bash /tmp/setup/oh-my-posh.sh
 
 # PWSH and OHMYPOSH
 FROM voltabaseohmyposh as voltabasepwshohmyposh
-USER $USERNAME
+USER vscode
 
 ADD setup /tmp/setup
 RUN pwsh -File "/tmp/setup/Install-Terminal.ps1"
 
 # FINAL
 FROM voltabase${PWSH}${OHMYPOSH} as voltafinal
-RUN rm -rf /tmp/setup
+RUN sudo rm -rf /tmp/setup
+USER vscode
