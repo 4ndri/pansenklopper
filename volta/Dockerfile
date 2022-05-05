@@ -11,13 +11,14 @@ FROM mcr.microsoft.com/vscode/devcontainers/base:0-${VARIANT} as base
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends curl ca-certificates gnupg apt-transport-https
 
-
+# volta
 FROM base AS voltabase
 
 USER $USERNAME
 # volta.sh node shim
 RUN curl https://get.volta.sh | bash
 
+# powershell
 FROM voltabase as voltabasepwsh
 
 USER $USERNAME
